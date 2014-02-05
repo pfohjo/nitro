@@ -86,30 +86,34 @@ int main(int argc, char **argv){
 
   
   printf("calling set_syscall_trap()...\n");
-  sc[0] = 0x9f;
-  sc[1] = 0x4a;
-  sc[2] = 0xaa;
-  rv = set_syscall_trap(sc,3);
+  //sc[0] = 0x9f;
+  //sc[1] = 0x4a;
+  //sc[2] = 0xaa;
+  //rv = set_syscall_trap(sc,3);
+  rv = set_syscall_trap(NULL,0);
   printf("set_syscall_trap() returned %d\n\n",rv);
   
   while(go){
-    rv = get_event(0,&event_data);
+    rv = get_event(&event_data);
     
     if(get_regs(0,&regs)){
       printf("Error getting regs, exiting\n");
-      continue_vm(0);
+      continue_vm();
       break;
     }
     if(get_sregs(0,&sregs)){
       printf("Error getting sregs, exiting\n");
-      continue_vm(0);
+      continue_vm();
       break;
     }
     if(rv == KVM_NITRO_EVENT_SYSCALL)
       printf("Syscall trapped key: 0x%lX cr3: 0x%llX rax: 0x%llX\n",event_data.syscall,sregs.cr3,regs.rax);
     else if(rv == KVM_NITRO_EVENT_SYSRET)
       printf("Sysret trapped key: 0x%lX cr3: 0x%llX\n",event_data.syscall,sregs.cr3);
-    rv = continue_vm(0);
+    
+    printf("calling continue...\n");
+    continue_vm();
+    printf("continue returned.\n");
   }
 
   
